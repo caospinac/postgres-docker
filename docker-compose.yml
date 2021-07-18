@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+
+  postgres:
+    build: .
+    container_name: pgengine
+    restart: always
+    volumes:
+      - ./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+      - pg-data:/var/lib/postgresql/data
+    env_file:
+      - .env
+    ports:
+      - ${POSTGRES_PORT:-5432}:5432
+    
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    links:
+      - postgres:db
+    volumes:
+      - type: volume
+        source: pgadmin-data
+        target: /var/lib/pgadmin
+    ports:
+      - ${PGADMIN_LISTEN_PORT:-5050}:5050
+    env_file:
+      - .env
+
+volumes:
+  pg-data:
+  pgadmin-data:
